@@ -1,5 +1,5 @@
 //
-// Created by chy on 7/15/2021.
+// Created by floppyhammer on 7/15/2021.
 //
 
 #include "demo.h"
@@ -8,7 +8,11 @@
 #include <glm/ext.hpp> // perspective, translate, rotate
 
 // NanoVG
+#ifdef WIN32
 #define NANOVG_GL3_IMPLEMENTATION
+#elif defined(__ANDROID__)
+#define NANOVG_GLES3_IMPLEMENTATION
+#endif
 #include <nanovg/nanovg.h>
 #include <nanovg/nanovg_gl.h>
 #include <nanovg/nanovg_gl_utils.h>
@@ -20,7 +24,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-bool Renderer::setup_graphics(int p_width, int p_height,
+bool VGRenderer::setup_graphics(int p_width, int p_height,
                               const char* svg_file_path,
                               const char* font_file_path) {
     print_gl_string("Version", GL_VERSION);
@@ -35,20 +39,28 @@ bool Renderer::setup_graphics(int p_width, int p_height,
     vg_image = nsvgParseFromFile(svg_file_path, "px", 96.0f);
     if (vg_image == nullptr) {
         printf("Could not open the target SVG file!\n");
+        XLOGE("Could not open the target SVG file!\n");
         return false;
     } else {
         printf("Opened the target SVG file\n");
+        XLOGI("Opened the target SVG file\n");
     }
 
     // NanoVG: Create context.
+#ifdef WIN32
     vg_context = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
+#elif defined(__ANDROID__)
+    vg_context = nvgCreateGLES3(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
+#endif
 
     // NanoVG: Create font.
     int res = nvgCreateFont(vg_context, "default", font_file_path);
     if (res < 0) {
         printf("Creating the target font failed, error %d\n", res);
+        XLOGE("Creating the target font failed, error %d\n", res);
     } else {
         printf("Created the target font %d\n", res);
+        XLOGI("Created the target font %d\n", res);
     }
 
     return true;
@@ -87,7 +99,7 @@ NVGpaint create_radial_gradient(NVGcontext* vg_context, NSVGgradient* gradient) 
     return paint;
 }
 
-void Renderer::render_frame(float delta, float elapsed) {
+void VGRenderer::render_frame(float delta, float elapsed) {
     // Render to screen.
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, window_width, window_height);
@@ -186,7 +198,7 @@ void Renderer::render_frame(float delta, float elapsed) {
     char buffer[64];
     memset(&buffer[0], 0, sizeof(buffer));
     int count = snprintf(buffer, sizeof buffer, "%.1f", delta);
-    //LOGI("Number of bytes that are written in the array: %d\n", count);
+    //XLOGI("Number of bytes that are written in the array: %d\n", count);
     buffer[count] = ' ';
     buffer[count + 1] = 'm';
     buffer[count + 2] = 's';
@@ -195,7 +207,7 @@ void Renderer::render_frame(float delta, float elapsed) {
     nvgResetTransform(vg_context);
     nvgFontSize(vg_context, 48.0f);
     nvgFontFace(vg_context, "default");
-    nvgFillColor(vg_context, nvgRGBA(255, 0, 0, 255));
+    nvgFillColor(vg_context, nvgRGBA(255, 255, 255, 255));
     nvgTextAlign(vg_context, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
     nvgText(vg_context, 0, 0, buffer, nullptr);
 

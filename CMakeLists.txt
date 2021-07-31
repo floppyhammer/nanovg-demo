@@ -12,11 +12,11 @@ else()
 endif()
 
 add_executable(nanovg-demo
-        src/main.cpp
+        demos/native/main.cpp
         external/inc/glad.c
         third_party/nanovg/nanovg.c
         src/demo.h src/demo.cpp
-        src/window.h src/window.cpp
+        demos/native/window.h demos/native/window.cpp
         )
 
 # Windows

@@ -1,12 +1,16 @@
 //
-// Created by chy on 7/15/2021.
+// Created by floppyhammer on 7/15/2021.
 //
 
 #ifndef DEMO_H
 #define DEMO_H
 
+#ifdef WIN32
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#elif defined(__ANDROID__)
+#include <GLES3/gl3.h>
+#endif
 
 #include <iostream>
 #include <cstdio>
@@ -20,14 +24,27 @@
 // NanoSVG
 #include <nanosvg.h>
 
+#ifdef __ANDROID__
+#include <stdarg.h>
+#include <android/log.h>
+#define LOG_TAG "nanovg_demo"
+#define XLOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
+#define XLOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+#else
+#define XLOGI(...)
+#define XLOGE(...)
+#endif
+
 static void print_gl_string(const char *name, GLenum s) {
     const char *v = (const char *) glGetString(s);
     printf("GL %s = %s\n", name, v);
+    XLOGI("GL %s = %s\n", name, v);
 }
 
 static void check_gl_error(const char* op) {
     for (GLint error = glGetError(); error; error = glGetError()) {
         printf("after %s() glError (0x%x)\n", op, error);
+        XLOGE("after %s() glError (0x%x)\n", op, error);
     }
 }
 
@@ -39,7 +56,7 @@ inline NVGcolor svg_color(unsigned int c) {
     return nvgRGBA((c & 0xFFu), ((c >> 8u) & 0xFFu), ((c >> 16u) & 0xFFu), ((c >> 24u) & 0xFFu));
 }
 
-class Renderer {
+class VGRenderer {
 public:
     // Screen size.
     int window_width{};
