@@ -24,6 +24,11 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+/*
+When used in Android demo, make sure to set EGL_DEPTH_SIZE = 16
+ and EGL_STENCIL_SIZE = 8 with setEGLConfigChooser() in JNIView.
+*/
+
 bool VGRenderer::setup_graphics(int p_width, int p_height,
                               const char* svg_file_path,
                               const char* font_file_path) {
