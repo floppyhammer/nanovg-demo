@@ -63,7 +63,7 @@ bool RendererES3::init() {
     auto window_height = 1920;
 
     vg_renderer.setup_graphics(window_width, window_height,
-                            "/sdcard/test/images/test_1.svg",
+                            "/sdcard/test/images/Ghostscript_Tiger.svg",
                             "/sdcard/test/fonts/lunchtime-doubly-so/lunchds.ttf");
     /////////////////// YOUR CODE ///////////////////
 
@@ -103,6 +103,7 @@ void RendererES3::draw(unsigned int numInstances) {
     duration = current_frame - last_time_show_fps;
     if (duration.count() > 2.0f) {
         printf("\nFrame time: %.1f ms.", delta);
+        XLOGI("\nFrame time: %.1f ms.", delta);
         last_time_show_fps = current_frame;
     }
 
