@@ -63,7 +63,7 @@ bool RendererES3::init() {
     auto window_height = 1920;
 
     vg_renderer.setup_graphics(window_width, window_height,
-                            "/sdcard/test/images/Ghostscript_Tiger.svg",
+                            "/sdcard/test/images/tiger.svg",
                             "/sdcard/test/fonts/lunchtime-doubly-so/lunchds.ttf");
     /////////////////// YOUR CODE ///////////////////
 

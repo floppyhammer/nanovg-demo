@@ -13,7 +13,7 @@ int main() {
     VGRenderer vg_renderer;
 
     vg_renderer.setup_graphics(window.width, window.height,
-                            "../res/images/Ghostscript_Tiger.svg",
+                               "../res/images/tiger.svg",
                             "../res/fonts/lunchtime-doubly-so/lunchds.ttf");
 
     std::chrono::time_point<std::chrono::steady_clock> start_frame = std::chrono::steady_clock::now();

@@ -113,6 +113,7 @@ void VGRenderer::render_frame(float delta, float elapsed) {
     // Transform.
     nvgResetTransform(vg_context);
     float scale_factor = ((float)std::sin(elapsed * 0.001f) + 1.0f) * 2.0f;
+    scale_factor = 1.0f;
     nvgTranslate(vg_context, (float)window_width / 2 - vg_image->width * scale_factor / 2, (float)window_height / 2 - vg_image->height * scale_factor / 2);
     nvgScale(vg_context, scale_factor, scale_factor);
 

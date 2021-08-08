@@ -27,12 +27,13 @@
       android:icon="@mipmap/ic_launcher"
       android:label="@string/gles3jni_activity">
     <activity android:name="GLES3JNIActivity"
+              android:label="NanoVG GLES3"
               android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
               android:launchMode="singleTask"
               android:configChanges="orientation|keyboardHidden">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+        <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
     </activity>
   </application>

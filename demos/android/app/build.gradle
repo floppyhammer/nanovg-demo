@@ -9,7 +9,7 @@ android {
     ndkVersion '22.1.7171670'
 
     defaultConfig {
-        applicationId 'com.android.nanovg'
+        applicationId 'com.android.nanovg_gles3'
         minSdkVersion "${platformVersion}"
         targetSdkVersion 28
         externalNativeBuild {
