@@ -15,6 +15,7 @@ android {
         externalNativeBuild {
             cmake {
                 arguments '-DANDROID_STL=c++_static'
+                arguments "-DCMAKE_BUILD_TYPE=Release"
             }
         }
     }
