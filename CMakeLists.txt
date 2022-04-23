@@ -4,29 +4,18 @@ project(nanovg-demo)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 
-if(WIN32)
-    include_directories(external/inc third_party)
-    link_directories(external/lib/lib-vc2019)
-else()
-    include_directories(external/inc third_party)
-endif()
+include_directories(external third_party)
+
+# GLFW library.
+include_directories(external/glfw/include)
+add_subdirectory(external/glfw)
 
 add_executable(nanovg-demo
         demos/native/main.cpp
-        external/inc/glad.c
+        external/glad.c
         third_party/nanovg/nanovg.c
         src/demo.h src/demo.cpp
-        demos/native/window.h demos/native/window.cpp
-        )
+        demos/native/window.h demos/native/window.cpp)
 
 # Windows
-if(WIN32)
-    target_link_libraries(nanovg-demo glfw3)
-else()
-    # Linux
-    # sudo apt install libglfw3-dev
-    # -lglfw for glfw
-    # -ldl for glad
-    # -lGL for opengl
-    target_link_libraries(flint -lglfw -ldl -lGL)
-endif()
+target_link_libraries(nanovg-demo glfw)
