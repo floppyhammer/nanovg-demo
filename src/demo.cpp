@@ -13,15 +13,18 @@
 #elif defined(__ANDROID__)
 #define NANOVG_GLES3_IMPLEMENTATION
 #endif
+
 #include <nanovg/nanovg.h>
 #include <nanovg/nanovg_gl.h>
 #include <nanovg/nanovg_gl_utils.h>
 
 #define NANOSVG_IMPLEMENTATION
+
 #include <nanosvg.h>
 
 // STB Image
 #define STB_IMAGE_IMPLEMENTATION
+
 #include <stb_image.h>
 
 /*
@@ -29,9 +32,9 @@ When used in Android demo, make sure to set EGL_DEPTH_SIZE = 16 and EGL_STENCIL_
 with setEGLConfigChooser() in JNIView.java.
 */
 
-bool VGRenderer::setup_graphics(int p_width, int p_height,
-                                const char* svg_file_path,
-                                const char* font_file_path) {
+bool VgRenderer::setup_graphics(int p_width, int p_height,
+                                const char *svg_file_path,
+                                const char *font_file_path) {
     print_gl_string("Version", GL_VERSION);
     print_gl_string("Vendor", GL_VENDOR);
     print_gl_string("Renderer", GL_RENDERER);
@@ -48,11 +51,11 @@ bool VGRenderer::setup_graphics(int p_width, int p_height,
         return false;
     }
 
-    // NanoVG: Create context.
+    // NanoVG: Create context. (Disabled NVG_DEBUG for benchmark.)
 #ifdef WIN32
-vg_context = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
+    vg_context = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
 #elif defined(__ANDROID__)
-    vg_context = nvgCreateGLES3(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
+    vg_context = nvgCreateGLES3(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
 #endif
 
     // NanoVG: Create font.
@@ -65,7 +68,7 @@ vg_context = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
     return true;
 }
 
-NVGpaint create_linear_gradient(NVGcontext* vg_context, NSVGgradient* gradient) {
+NVGpaint create_linear_gradient(NVGcontext *vg_context, NSVGgradient *gradient) {
     float inverse[6];
     float sx, sy, ex, ey;
 
@@ -78,7 +81,7 @@ NVGpaint create_linear_gradient(NVGcontext* vg_context, NSVGgradient* gradient) 
                              svg_color(gradient->stops[gradient->nstops - 1].color));
 }
 
-NVGpaint create_radial_gradient(NVGcontext* vg_context, NSVGgradient* gradient) {
+NVGpaint create_radial_gradient(NVGcontext *vg_context, NSVGgradient *gradient) {
     float inverse[6];
     float cx, cy, r1, r2, inr, outr;
 
@@ -98,7 +101,7 @@ NVGpaint create_radial_gradient(NVGcontext* vg_context, NSVGgradient* gradient) 
     return paint;
 }
 
-void VGRenderer::render_frame(float delta, float elapsed) {
+void VgRenderer::render_frame(float delta, float elapsed) {
     // Render to screen.
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, window_width, window_height);
@@ -112,9 +115,10 @@ void VGRenderer::render_frame(float delta, float elapsed) {
 
     // Transform.
     nvgResetTransform(vg_context);
-    float scale_factor = ((float)std::sin(elapsed * 0.001f) + 1.0f) * 2.0f;
+    float scale_factor = ((float) std::sin(elapsed * 0.001f) + 1.0f) * 2.0f;
     scale_factor = 1.0f;
-    nvgTranslate(vg_context, (float)window_width / 2 - vg_image->width * scale_factor / 2, (float)window_height / 2 - vg_image->height * scale_factor / 2);
+    nvgTranslate(vg_context, (float) window_width / 2 - vg_image->width * scale_factor / 2,
+                 (float) window_height / 2 - vg_image->height * scale_factor / 2);
     nvgScale(vg_context, scale_factor, scale_factor);
 
     // Traverse the SVG tree.
@@ -139,12 +143,13 @@ void VGRenderer::render_frame(float delta, float elapsed) {
 
             // Traverse Bezier curves.
             for (int i = 0; i < path->npts - 3; i += 3) {
-                float* p = &path->pts[i * 2];
+                float *p = &path->pts[i * 2];
                 nvgBezierTo(vg_context, p[2], p[3], p[4], p[5], p[6], p[7]);
             }
 
-            if (path->closed)
+            if (path->closed) {
                 nvgLineTo(vg_context, path->pts[0], path->pts[1]);
+            }
 
             // Draw fill.
             switch (shape->fill.type) {
@@ -152,21 +157,25 @@ void VGRenderer::render_frame(float delta, float elapsed) {
                     nvgFillColor(vg_context, nvgRGBA(fill_cr, fill_cg, fill_cb, fill_ca));
                     nvgFill(vg_context);
                     break;
-                    case NSVG_PAINT_LINEAR_GRADIENT:
-                        nvgFillPaint(vg_context, create_linear_gradient(vg_context, shape->fill.gradient));
-                        nvgFill(vg_context);
-                        break;
-                        case NSVG_PAINT_RADIAL_GRADIENT:
-                            nvgFillPaint(vg_context, create_radial_gradient(vg_context, shape->fill.gradient));
-                            nvgFill(vg_context);
-                            break;
+                case NSVG_PAINT_LINEAR_GRADIENT:
+                    nvgFillPaint(vg_context, create_linear_gradient(vg_context, shape->fill.gradient));
+                    nvgFill(vg_context);
+                    break;
+                case NSVG_PAINT_RADIAL_GRADIENT:
+                    nvgFillPaint(vg_context, create_radial_gradient(vg_context, shape->fill.gradient));
+                    nvgFill(vg_context);
+                    break;
             }
 
             // Set stroke parameters.
             int join = NVG_MITER; // Default
             switch (shape->strokeLineJoin) {
-                case NSVG_JOIN_ROUND: join = NVG_ROUND; break;
-                case NSVG_JOIN_BEVEL: join = NVG_BEVEL; break;
+                case NSVG_JOIN_ROUND:
+                    join = NVG_ROUND;
+                    break;
+                case NSVG_JOIN_BEVEL:
+                    join = NVG_BEVEL;
+                    break;
             }
             nvgLineJoin(vg_context, join);
 
@@ -176,18 +185,21 @@ void VGRenderer::render_frame(float delta, float elapsed) {
 
             // Draw stroke.
             switch (shape->stroke.type) {
-                case NSVG_PAINT_COLOR:
+                case NSVG_PAINT_COLOR: {
                     nvgStrokeColor(vg_context, nvgRGBA(stroke_cr, stroke_cg, stroke_cb, stroke_ca));
                     nvgStroke(vg_context);
+                }
                     break;
-                    case NSVG_PAINT_LINEAR_GRADIENT:
-                        nvgStrokePaint(vg_context, create_linear_gradient(vg_context, shape->stroke.gradient));
-                        nvgStroke(vg_context);
-                        break;
-                        case NSVG_PAINT_RADIAL_GRADIENT:
-                            nvgStrokePaint(vg_context, create_radial_gradient(vg_context, shape->stroke.gradient));
-                            nvgStroke(vg_context);
-                            break;
+                case NSVG_PAINT_LINEAR_GRADIENT: {
+                    nvgStrokePaint(vg_context, create_linear_gradient(vg_context, shape->stroke.gradient));
+                    nvgStroke(vg_context);
+                }
+                    break;
+                case NSVG_PAINT_RADIAL_GRADIENT: {
+                    nvgStrokePaint(vg_context, create_radial_gradient(vg_context, shape->stroke.gradient));
+                    nvgStroke(vg_context);
+                }
+                    break;
             }
         }
 
@@ -195,27 +207,27 @@ void VGRenderer::render_frame(float delta, float elapsed) {
     }
 
     // Render text.
-    /////////////////////////////////////
+    // --------------------------------------
     // Set text buffer.
-    char buffer[64];
-    memset(&buffer[0], 0, sizeof(buffer));
-    int count = snprintf(buffer, sizeof buffer, "%.1f", delta);
-
-    //printf("Number of bytes that are written in the array: %d\n", count);
-    //XLOGI("Number of bytes that are written in the array: %d\n", count);
-
-    buffer[count] = ' ';
-    buffer[count + 1] = 'm';
-    buffer[count + 2] = 's';
-
-    // Reset transform for text.
-    nvgResetTransform(vg_context);
-    nvgFontSize(vg_context, 48.0f);
-    nvgFontFace(vg_context, "default");
-    nvgFillColor(vg_context, nvgRGBA(255, 255, 255, 255));
-    nvgTextAlign(vg_context, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
-    nvgText(vg_context, 0, 0, buffer, nullptr);
-    /////////////////////////////////////
+//    char buffer[64];
+//    memset(&buffer[0], 0, sizeof(buffer));
+//    int count = snprintf(buffer, sizeof buffer, "%.1f", delta);
+//
+//    //printf("Number of bytes that are written in the array: %d\n", count);
+//    //XLOGI("Number of bytes that are written in the array: %d\n", count);
+//
+//    buffer[count] = ' ';
+//    buffer[count + 1] = 'm';
+//    buffer[count + 2] = 's';
+//
+//    // Reset transform for text.
+//    nvgResetTransform(vg_context);
+//    nvgFontSize(vg_context, 48.0f);
+//    nvgFontFace(vg_context, "default");
+//    nvgFillColor(vg_context, nvgRGBA(255, 255, 255, 255));
+//    nvgTextAlign(vg_context, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
+//    nvgText(vg_context, 0, 0, buffer, nullptr);
+    // --------------------------------------
 
     // NanoVG: End.
     nvgEndFrame(vg_context);

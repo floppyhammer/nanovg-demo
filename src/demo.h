@@ -56,7 +56,7 @@ inline NVGcolor svg_color(unsigned int c) {
     return nvgRGBA((c & 0xFFu), ((c >> 8u) & 0xFFu), ((c >> 16u) & 0xFFu), ((c >> 24u) & 0xFFu));
 }
 
-class VGRenderer {
+class VgRenderer {
 public:
     // Screen size.
     int window_width{};

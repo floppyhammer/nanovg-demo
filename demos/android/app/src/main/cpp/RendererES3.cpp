@@ -27,7 +27,7 @@ public:
 
     /////////////////// YOUR CODE ///////////////////
     std::chrono::time_point<std::chrono::steady_clock> start_frame, last_frame, last_time_show_fps;
-    VGRenderer vg_renderer;
+    VgRenderer vg_renderer;
     /////////////////// YOUR CODE ///////////////////
 
 private:
