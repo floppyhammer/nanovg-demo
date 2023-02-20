@@ -5,7 +5,8 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include <glad/glad.h>
+#include <glad/gl.h>
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
 class Window {
@@ -32,4 +33,4 @@ private:
     static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 };
 
-#endif //WINDOW_H
+#endif // WINDOW_H

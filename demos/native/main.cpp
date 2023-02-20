@@ -2,18 +2,19 @@
 // Created by floppyhammer on 7/15/2021.
 //
 
+#include <chrono>
+
 #include "../../src/demo.h"
 #include "window.h"
-
-#include <chrono>
 
 int main() {
     Window window(1920, 1080);
 
     VgRenderer vg_renderer;
 
-    vg_renderer.setup_graphics(window.width, window.height,
-                               "../res/images/tigers_x20.svg",
+    vg_renderer.setup_graphics(window.width,
+                               window.height,
+                               "../res/images/tiger.svg",
                                "../res/fonts/lunchtime-doubly-so/lunchds.ttf");
 
     std::chrono::time_point<std::chrono::steady_clock> start_frame = std::chrono::steady_clock::now();
@@ -26,11 +27,11 @@ int main() {
 
         // Time between frames in ms.
         std::chrono::duration<double> duration = current_frame - last_frame;
-        auto delta = (float) round(duration.count() * 1000.0f);
+        auto delta = (float)round(duration.count() * 1000.0f);
 
         // Time since program started in ms.
         duration = current_frame - start_frame;
-        auto elapsed = (float) round(duration.count() * 1000.0f);
+        auto elapsed = (float)round(duration.count() * 1000.0f);
 
         last_frame = current_frame;
 

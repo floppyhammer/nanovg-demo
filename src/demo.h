@@ -6,17 +6,16 @@
 #define DEMO_H
 
 #ifdef WIN32
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+    #include <glad/gl.h>
 #elif defined(__ANDROID__)
-#include <GLES3/gl3.h>
+    #include <GLES3/gl3.h>
 #endif
 
-#include <iostream>
+#include <chrono>
+#include <cmath>
 #include <cstdio>
 #include <cstdlib>
-#include <cmath>
-#include <chrono>
+#include <iostream>
 
 // NanoVG
 #include <nanovg/nanovg.h>
@@ -25,18 +24,18 @@
 #include <nanosvg.h>
 
 #ifdef __ANDROID__
-#include <stdarg.h>
-#include <android/log.h>
-#define LOG_TAG "nanovg_demo"
-#define XLOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
-#define XLOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+    #include <android/log.h>
+    #include <stdarg.h>
+    #define LOG_TAG "nanovg_demo"
+    #define XLOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
+    #define XLOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 #else
-#define XLOGI(...)
-#define XLOGE(...)
+    #define XLOGI(...)
+    #define XLOGE(...)
 #endif
 
-static void print_gl_string(const char *name, GLenum s) {
-    const char *v = (const char *) glGetString(s);
+static void print_gl_string(const char* name, GLenum s) {
+    const char* v = (const char*)glGetString(s);
     printf("GL %s = %s\n", name, v);
     XLOGI("GL %s = %s\n", name, v);
 }
@@ -58,6 +57,8 @@ inline NVGcolor svg_color(unsigned int c) {
 
 class VgRenderer {
 public:
+    ~VgRenderer();
+
     // Screen size.
     int window_width{};
     int window_height{};
@@ -71,4 +72,4 @@ public:
     void render_frame(float delta, float elapsed);
 };
 
-#endif //DEMO_H
+#endif // DEMO_H

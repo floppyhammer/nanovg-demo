@@ -12,10 +12,10 @@ add_subdirectory(external/glfw)
 
 add_executable(nanovg-demo
         demos/native/main.cpp
-        external/glad.c
         third_party/nanovg/nanovg.c
         src/demo.h src/demo.cpp
-        demos/native/window.h demos/native/window.cpp)
+        demos/native/window.h
+        demos/native/window.cpp)
 
 # Windows
 target_link_libraries(nanovg-demo glfw)

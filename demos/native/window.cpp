@@ -4,6 +4,9 @@
 
 #include "window.h"
 
+#define GLAD_GL_IMPLEMENTATION
+#include <glad/gl.h>
+
 #include <iostream>
 
 Window::Window(int p_width, int p_height) : width(p_width), height(p_height) {
@@ -43,7 +46,7 @@ GLFWwindow* Window::init_glfw_window() const {
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     // GLAD: load all OpenGL function pointers.
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+    if (!gladLoadGL(glfwGetProcAddress)) {
         std::cout << "Failed to initialize GLAD" << std::endl;
         return nullptr;
     }
@@ -69,8 +72,9 @@ GLFWwindow* Window::get_glfw_window() {
 
 /// Process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly.
 void Window::handle_inputs() {
-    if (glfwGetKey(glfw_window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    if (glfwGetKey(glfw_window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(glfw_window, true);
+    }
 }
 
 void Window::swap_buffers_and_poll_events() {
