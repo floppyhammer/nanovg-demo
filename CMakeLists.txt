@@ -1,21 +1,21 @@
 cmake_minimum_required(VERSION 3.16.1)
-project(nanovg-demo)
+
+project(nanovg_demo)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 
-include_directories(external third_party)
+include_directories(third_party)
 
-# GLFW library.
-include_directories(external/glfw/include)
-add_subdirectory(external/glfw)
+if (WIN32)
+    include_directories(external)
+    # GLFW library.
+    include_directories(external/glfw/include)
+    add_subdirectory(external/glfw)
+endif ()
 
-add_executable(nanovg-demo
-        demos/native/main.cpp
-        third_party/nanovg/nanovg.c
-        src/demo.h src/demo.cpp
-        demos/native/window.h
-        demos/native/window.cpp)
+add_library(nanovg_demo src/demo.cpp third_party/nanovg/nanovg.c)
 
-# Windows
-target_link_libraries(nanovg-demo glfw)
+if (WIN32)
+    add_subdirectory(demo/native)
+endif ()

@@ -2,8 +2,8 @@
 // Created by floppyhammer on 7/15/2021.
 //
 
-#ifndef DEMO_H
-#define DEMO_H
+#ifndef NANOVG_DEMO_H
+#define NANOVG_DEMO_H
 
 #ifdef WIN32
     #include <glad/gl.h>
@@ -17,11 +17,9 @@
 #include <cstdlib>
 #include <iostream>
 
-// NanoVG
-#include <nanovg/nanovg.h>
-
-// NanoSVG
+// nanovg requires us to include cstdio first.
 #include <nanosvg.h>
+#include <nanovg/nanovg.h>
 
 #ifdef __ANDROID__
     #include <android/log.h>
@@ -30,26 +28,24 @@
     #define XLOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
     #define XLOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 #else
-    #define XLOGI(...)
-    #define XLOGE(...)
+    #define XLOGI printf
+    #define XLOGE printf
 #endif
 
-static void print_gl_string(const char* name, GLenum s) {
-    const char* v = (const char*)glGetString(s);
-    printf("GL %s = %s\n", name, v);
+static void print_gl_string(const char *name, GLenum s) {
+    const char *v = (const char *)glGetString(s);
     XLOGI("GL %s = %s\n", name, v);
 }
 
-static void check_gl_error(const char* op) {
+static void check_gl_error(const char *op) {
     for (GLint error = glGetError(); error; error = glGetError()) {
-        printf("after %s() glError (0x%x)\n", op, error);
         XLOGE("after %s() glError (0x%x)\n", op, error);
     }
 }
 
-NVGpaint create_linear_gradient(NVGcontext* vg_context, NSVGgradient* gradient);
+NVGpaint create_linear_gradient(NVGcontext *vg_context, NSVGgradient *gradient);
 
-NVGpaint create_radial_gradient(NVGcontext* vg_context, NSVGgradient* gradient);
+NVGpaint create_radial_gradient(NVGcontext *vg_context, NSVGgradient *gradient);
 
 inline NVGcolor svg_color(unsigned int c) {
     return nvgRGBA((c & 0xFFu), ((c >> 8u) & 0xFFu), ((c >> 16u) & 0xFFu), ((c >> 24u) & 0xFFu));
@@ -57,19 +53,24 @@ inline NVGcolor svg_color(unsigned int c) {
 
 class VgRenderer {
 public:
+    VgRenderer();
+
     ~VgRenderer();
 
-    // Screen size.
-    int window_width{};
-    int window_height{};
+    bool setup_graphics(int _width, int _height, const char *svg_file_path, const char *font_file_path);
 
-    NVGcontext* vg_context = nullptr;
+    void render_frame();
 
-    NSVGimage* vg_image = nullptr;
+private:
+    // Canvas size.
+    int canvas_width{};
+    int canvas_height{};
 
-    bool setup_graphics(int p_width, int p_height, const char* svg_file_path, const char* font_file_path);
+    NVGcontext *nvg_context = nullptr;
 
-    void render_frame(float delta, float elapsed);
+    NSVGimage *nsvg_image = nullptr;
+
+    std::chrono::time_point<std::chrono::steady_clock> start_time, last_frame_time, last_time_show_fps;
 };
 
-#endif // DEMO_H
+#endif // NANOVG_DEMO_H
